@@ -115,7 +115,7 @@ class ConwaysGameOfLife(object):
 			return d.get(x, str(x))
 		return show_param
 
-	def sp_print(self, matrix: np):
+	def sp_print(self, matrix: np) -> None:
 		"""
 		отрисовка в консоли
 		:param matrix:
@@ -127,36 +127,54 @@ class ConwaysGameOfLife(object):
 			print()
 
 	def get_arr(self) -> np:
+		"""
+		Получение массива
+		:return:
+		"""
 		return self.now
 
 	def set_arr(self, arr: np) -> None:
+		"""
+		Установка массива
+		:param arr:
+		:return:
+		"""
 		# изменение размеров тора
 		self.recoord = self.recoord_set(*self.arr.shape)
 		# задание внутреннего массива
 		self.now = arr
+
+	def reset(self):
 		# обнеуление ходов
 		self.step = 0
 		# обнуление истории
 		self.hist = [np.array([0]) for i in range(20)]  # создание очереди истории
 
-	def next_step(self) -> np:
+	def next_step(self) -> tuple:
 		self.step += 1
-		print(f"Ход: {self.step}")
 		self.new = self.fate_all(self.now)
-		self.sp_print(self.new)
+
+		# вывод в консоль, если консольный запуск
+		if __name__ == '__main__':
+			print(f"Ход: {self.step}")
+			self.sp_print(self.new)
+
 		if np.array_equal(self.new, self.now):
 			print ("-===Колония не изменяется===-")
+			return self.now, 'stable'
 		elif any(np.array_equal(self.new, arr) for arr in self.hist):
 			print("-===Цикл===-")
+			return self.now, 'cycle'
 		elif not np.sum(self.new.flatten()):
 			print("-===Гибель колонии===-")
+			return self.now, 'death'
 
 		# сохраняем старое значение для отслеживания циклов
 		self.hist.append(self.now)
 		# купирование разрастания истории (очередь заданного размера)
 		self.hist.pop(0)
 		self.now = self.new
-		return self.now
+		return self.now, 0
 
 
 
@@ -218,7 +236,7 @@ if __name__ == '__main__':
 				, [0, 1, 1, 1, 0]
 				, [0, 0, 0, 0, 0]
 				, [0, 0, 0, 0, 0]])
-	gof = ConwaysGameOfLife(sample3)
-	print(gof.next_step())
-	print(gof.next_step())
-	print(gof.next_step())
+	gol = ConwaysGameOfLife(sample3)
+	gol_play = 0
+	while not gol_play:
+		gol_play = gol.next_step()[1]

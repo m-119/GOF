@@ -1,14 +1,15 @@
+from time import sleep
 from tkinter import *
 import numpy as np
-
+from ConwaysGameOfLife import ConwaysGameOfLife
 
 class Drawing(object):
 	def __init__(
 				self,
 				dot_width: int = 10,
 				dot_height: int = 10,
-				dot_cnv_width: int = 10,
-				dot_cnv_height: int = 5,
+				dot_cnv_width: int = 40,
+				dot_cnv_height: int = 20,
 				arr: np = None):
 		"""
 		:param dot_width: ширина точки
@@ -21,20 +22,26 @@ class Drawing(object):
 		self.dot_cnv_width: int = dot_cnv_width
 		self.dot_cnv_height: int = dot_cnv_height
 		self.arr = arr
+		# играть
 		self.play = False
+		# Статус
+		self.status = "-"
 		# инициализация меню
 		self.menu = Menu(tearoff=0)
 		self.menu.add_command(command=self.game_start, label="▶")		# первоначальная установка в меню
-		root.bind("<Button-3>", self.menu_popup)									# действие ПКМ
-
-		# print(arr)
-
+		root.bind("<Button-3>", self.menu_popup)						# действие ПКМ
+		root.title(self.status)
 		# начальные значения, в зависимости от массива:
 		if arr is None:
 			self.arr = np.zeros((self.dot_cnv_height, self.dot_cnv_width), int)
 		elif arr is not None:
 			self.dot_cnv_width = len(arr[0])
 			self.dot_cnv_height = len(arr)
+
+		# подключение игры
+		self.gol = ConwaysGameOfLife(np.zeros((self.dot_cnv_height, self.dot_cnv_width), int))
+		# получение ссылки на массив игры
+		self.arr = self.gol.get_arr()
 
 		# перевод в пиксели
 		self.c_width = self.dot_cnv_width * self.dot_width  # ширина канвы в пикселях
@@ -89,14 +96,15 @@ class Drawing(object):
 				# print(f"draw_dots -> draw_dot({x}, {y})")
 				self.draw_dot(x, y)
 
-	def arr_edit(self, x=0, y=0):
+	def arr_edit(self, x: int=0, y: int=0) -> None:
 		"""
 		Обработка изменений массива игры
 		:param x:
 		:param y:
 		:return:
 		"""
-		self.arr[y, x] = not self.arr[y, x]
+		self.arr[y][x] = not self.arr[y][x]
+		self.gol.reset()
 		#print(self.arr)
 
 	# print(arr)
@@ -131,10 +139,18 @@ class Drawing(object):
 		# рисуем квадрат
 		self.draw_dot(x_, y_)
 
+		self.status = "-"
+		root.title(self.status)
+
+		if self.play:
+			self.animation_start()
+
 	def game_start(self):
 		#print(f"old_play: {self.play}")
 		self.play = not self.play
 		#print(f"new_play: {self.play}")
+		self.animation_start()
+
 
 	def menu_popup(self, event):
 		# всплывающее меню
@@ -144,6 +160,16 @@ class Drawing(object):
 		self.menu.add_command(command=self.game_start, label="⏸" if self.play else "▶")
 		self.menu.delete(0)
 		self.menu.post(event.x_root, event.y_root)
+
+	def animation_start(self):
+		while self.play and self.status == "-":
+			self.arr = self.gol.next_step()[0]
+			self.status = "-" if not self.gol.next_step()[1] else self.gol.next_step()[1]
+			sleep(0.1)
+			self.draw_dots()
+			root.update()
+		root.title(self.status)
+
 
 if __name__ == '__main__':
 
@@ -156,5 +182,5 @@ if __name__ == '__main__':
 		[0, 0, 0, 1, 0, 0, 0, 1, 0, 0]])
 	root = Tk()
 
-	obj = Drawing(dot_height=20, dot_width=20, arr=ar)
+	obj = Drawing()
 	root.mainloop()
