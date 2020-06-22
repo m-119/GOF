@@ -2,8 +2,7 @@ from tkinter import *
 import numpy as np
 
 
-
-class Drawing():
+class Drawing:
 	def __init__(
 				self,
 				dot_width: int = 10,
@@ -127,19 +126,16 @@ class Drawing():
 		self.draw_dot(x_, y_)
 
 
+if __name__ == '__main__':
 
-# тестовые данные
-ar = np.array([
-	[0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-	[0, 0, 1, 0, 0, 1, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 1, 0, 0, 0, 1, 0, 0]])
+	# тестовые данные
+	ar = np.array([
+		[0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+		[0, 0, 1, 0, 0, 1, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 1, 0, 0, 0, 1, 0, 0]])
+	root = Tk()
 
-
-
-
-root = Tk()
-
-obj = Drawing(dot_height=20, dot_width=20, arr=ar)
-root.mainloop()
+	obj = Drawing(dot_height=20, dot_width=20, arr=ar)
+	root.mainloop()
