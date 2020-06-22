@@ -21,6 +21,12 @@ class Drawing:
 		self.dot_cnv_width: int = dot_cnv_width
 		self.dot_cnv_height: int = dot_cnv_height
 		self.arr = arr
+		self.play = False
+		# инициализация меню
+		self.menu = Menu(tearoff=0)
+		self.menu.add_command(command=self.game_start(), label=("⏸" if self.play else "▶"))
+		root.bind("<Button-3>", self.menu_popup)
+
 		# print(arr)
 
 		# начальные значения, в зависимости от массива:
@@ -125,6 +131,17 @@ class Drawing:
 		# рисуем квадрат
 		self.draw_dot(x_, y_)
 
+	def menu_popup(self, event):
+		# всплывающее меню
+		# это взял отсюда:
+		# https://younglinux.info/tkinter/menu.php
+		self.menu.post(event.x_root, event.y_root)
+		self.menu.delete(0)
+		self.menu.add_command(command=self.game_start(), label=("⏸" if self.play else "▶"))
+
+	def game_start(self):
+		print(self.play)
+		self.play = not self.play
 
 if __name__ == '__main__':
 
