@@ -2,7 +2,7 @@ from tkinter import *
 import numpy as np
 
 
-class Drawing:
+class Drawing(object):
 	def __init__(
 				self,
 				dot_width: int = 10,
@@ -24,8 +24,8 @@ class Drawing:
 		self.play = False
 		# инициализация меню
 		self.menu = Menu(tearoff=0)
-		self.menu.add_command(command=self.game_start(), label=("⏸" if self.play else "▶"))
-		root.bind("<Button-3>", self.menu_popup)
+		self.menu.add_command(command=self.game_start, label="▶")		# первоначальная установка в меню
+		root.bind("<Button-3>", self.menu_popup)									# действие ПКМ
 
 		# print(arr)
 
@@ -131,17 +131,19 @@ class Drawing:
 		# рисуем квадрат
 		self.draw_dot(x_, y_)
 
+	def game_start(self):
+		#print(f"old_play: {self.play}")
+		self.play = not self.play
+		#print(f"new_play: {self.play}")
+
 	def menu_popup(self, event):
 		# всплывающее меню
 		# это взял отсюда:
 		# https://younglinux.info/tkinter/menu.php
-		self.menu.post(event.x_root, event.y_root)
+		# изменить лэйбл
+		self.menu.add_command(command=self.game_start, label="⏸" if self.play else "▶")
 		self.menu.delete(0)
-		self.menu.add_command(command=self.game_start(), label=("⏸" if self.play else "▶"))
-
-	def game_start(self):
-		print(self.play)
-		self.play = not self.play
+		self.menu.post(event.x_root, event.y_root)
 
 if __name__ == '__main__':
 
